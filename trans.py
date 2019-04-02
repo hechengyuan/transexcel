@@ -1,4 +1,5 @@
-import xlrd, xlwt, os
+import xlrd, xlwt, os, json
+
 
 def get_all_name():
     path = 'data/'
@@ -13,24 +14,22 @@ def get_all_name():
 
 
 def read_data(filename):
-    realname = f'data/{filename}'
-    data = xlrd.open_workbook(realname)
+    data = xlrd.open_workbook(f'data/{filename}')
     table1 = data.sheets()[0]
     table2 = data.sheets()[1]
-    table3 =
-    first_name = table1.cell_value(2,1)
-    last_name = table1.cell_value(1,1)
-    name = first_name + last_name
-    date = table1.cell_value(0,4)
-    height = table1.cell_value(5,1)
-    weight = table1.cell_value(6,1)
-    age = table1.cell_value(4,1)
-    gender = table1.cell_value(3,1)
-    bmi = table1.cell_value(5,4)
-    hrmax = table1.cell_value(6,4)
-    mets = table2.cell_value(13,7)
-    vo2max = table2.cell_value(11,7)
-    return name, date, height, weight, age, gender, bmi, hrmax, mets, vo2max
+    with open('setting.json','r') as f:
+        setting = json.load(f)
+
+    slice = []
+    for key in list(setting.keys()):
+        if setting[key][0] == 0:
+            slice.append(table1.cell_value(setting[key][1],setting[key][2]))
+        elif setting[key][0] == 1:
+            slice.append(table2.cell_value(setting[key][1],setting[key][2]))
+        else:
+            pass
+
+    return slice
 
 
 def write_data():
@@ -47,5 +46,6 @@ def write_data():
         n = n + 1
 
     workbook.save('all_data.xls')
+
 
 write_data()
